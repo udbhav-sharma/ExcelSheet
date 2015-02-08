@@ -33,7 +33,7 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
         {examId:3, examName:'Minor 2', maxMarks:10},
         {examId:4, examName:'End', maxMarks:50}
     ];
-    $scope.rollNumbers = ['117161','117162','117163','117164','117165','117166','117167','117168','117169','117170'];
+    $scope.rollNumbers = generateRandomRollNumbers();
 
     //Default Assignment
     $scope.cells = initializeCells();
@@ -60,6 +60,30 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
         for (var i in $scope.exams)
             contribution[$scope.exams[i].examId] = 1;
         return contribution;
+    }
+
+    function generateRandomRollNumbers(){
+        var min = 117101;
+        var max =  117170;
+        var last = Math.floor(Math.random() * (max - min)) + min;
+        var roll=[];
+        for(var i=min; i<=last; i++){
+            roll.push(i);
+        }
+        return roll;
+    }
+
+    $scope.fillCell = function fillCell(){
+        var min, max, value;
+        for (var i in $scope.rollNumbers){
+            for(var j in $scope.exams){
+                max=$scope.exams[j].maxMarks;
+                min=0;
+                value = Math.floor(Math.random() * (max - min)) + min;
+                $scope.cells[$scope.rollNumbers[i]][$scope.exams[j].examId] = value;
+                //console.log(value);
+            }
+        }
     }
 
     $scope.calculateAverageMarks = function calculateAverageMarks( column ){
@@ -154,7 +178,7 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
     function average( list ){
         var tempSum = sum( list );
         if(isFormatValid(tempSum))
-            tempSum = tempSum/list.length;
+            tempSum = parseFloat(tempSum/list.length);
         return tempSum;
     }
 
