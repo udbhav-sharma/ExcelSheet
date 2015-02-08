@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Excel Sheet</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="bower_components/html5-boilerplate/css/normalize.css">
+  <link rel="stylesheet" href="bower_components/html5-boilerplate/css/main.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="app.css">
+
+  <script src="bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js"></script>
+</head>
+<body>
+
+  <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+  <![endif]-->
+<div class="container-fluid" ng-app="exam" ng-controller="sheet">
+    <br>
+    <div class="row">
+        <div class="col-md-7">
+            <div >
+                <table>
+                    <tr class="column-label">
+                        <td></td>
+                        <td ng-repeat="exam in exams">{{exam.examName}}</td>
+                        <td> Total </td>
+                        <td> Grade </td>
+                    </tr>
+
+                    <tr ng-repeat="roll in rollNumbers">
+                        <td class="row-label">{{roll}}</td>
+                        <td ng-repeat="exam in exams">
+                            <div>
+                                <input type="text" ng-pattern="marksPattern" ng-model="cells[roll][exam.examId]" >
+                                <div class="output">{{cells[roll][exam.examId]}}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <div ng-bind="calculateTotalMarks(roll,cells[roll])" class="output"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <input ng-pattern="gradePattern" ng-change="drawGraph()" ng-model="grades[roll]" >
+                                <div class="output" >{{grades[roll]}}</div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="row-label"></td>
+                        <td ng-repeat="exam in exams">
+                            <div>
+                                <div class="output"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <div class="output"></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="row-label">Average</td>
+                        <td ng-repeat="exam in exams">
+                            <div>
+                                <div ng-bind="calculateAverageMarks(exam.examId)"class="output"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <div ng-bind="calculateColumnContributionTotal(avg)" class="output"></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="row-label"></td>
+                        <td ng-repeat="exam in exams">
+                            <div>
+                                <div class="output"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <div class="output"></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="row-label">Max Marks</td>
+                        <td ng-repeat="exam in exams">
+                            <div>
+                                <input ng-pattern="marksPattern" ng-model="exam.maxMarks">
+                                <div class="output" >{{exam.maxMarks}}</div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <div ng-bind="" class="output"></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="row-label">Contribution</td>
+                        <td ng-repeat="exam in exams">
+                            <div>
+                                <input ng-pattern="marksPattern" ng-model="contribution[exam.examId]">
+                                <div class="output" >{{contribution[exam.examId]}}</div>
+                            </div>
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <h4>Grades</h4>
+            <div class="row">
+                <form class="form-horizontal">
+                    <div ng-repeat="gradeOb in gradeType">
+                        <div class="col-md-3 form-group">
+                            <label for="input{{gradeOb.grade}}" class="col-md-4 control-label">{{gradeOb.grade}}</label>
+                            <div class="col-md-6">
+                                <input type="number" class="form-control input-sm" id="input{{gradeOb.grade}}" placeholder="Max Marks" ng-model="gradeOb.minMarks">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-sm btn-danger" ng-click="calculateGrade()"><span class="fa fa-graduation-cap"></span>  Assign Grade</button>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-sm btn-primary" ng-click="drawGraph()"><span class="fa fa-bar-chart"></span> Grades Bar Chart</button>
+                </div>
+            </div>
+            <div class="row">
+                <div id="graph">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+      <!-- In production use:
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
+  -->
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+  <script src="http://cdn.oesmith.co.uk/morris-0.4.1.min.js"></script>
+
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/angular-route/angular-route.js"></script>
+  <script src="app.js"></script>
+  <script src="components/version/version.js"></script>
+  <script src="components/version/version-directive.js"></script>
+  <script src="components/version/interpolate-filter.js"></script>
+</body>
+</html>

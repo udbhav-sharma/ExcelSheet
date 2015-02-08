@@ -1,0 +1,77 @@
+/* app css stylesheet */
+
+.menu {
+  list-style: none;
+  border-bottom: 0.1em solid black;
+  margin-bottom: 2em;
+  padding: 0 0 0.5em;
+}
+
+.menu:before {
+  content: "[";
+}
+
+.menu:after {
+  content: "]";
+}
+
+.menu > li {
+  display: inline;
+}
+
+.menu > li:before {
+  content: "|";
+  padding-right: 0.3em;
+}
+
+.menu > li:nth-child(1):before {
+  content: "";
+  padding: 0;
+}
+body { font-family: sans-serif; }
+
+.output, input {
+    font-size: 10pt;
+    position: absolute;
+    height: 1.2em;
+    width: 50pt;
+    height: 16pt;
+    overflow: hidden;
+    padding-left: 4pt;
+}
+
+input {
+    border: none;
+    border-radius: 0px !important;
+}
+
+button{
+    border-radius: 0px !important;
+}
+
+.output {
+    background: white;
+    pointer-events: none;
+    padding-top: 2pt;
+    height: 14pt;
+}
+
+input:focus + .output { display: none; }
+table { border-collapse: collapse; }
+
+td > div {
+    width: 55pt;
+    height: 16pt;
+}
+td { border: 1px solid #EEE; }
+
+.column-label  > td, .row-label {
+    text-align: center;
+    background: #EEE;
+}
+
+.row-label { width: 2em; }
+
+input.ng-invalid.ng-touched {
+    background-color: #fa0f0e;
+}
