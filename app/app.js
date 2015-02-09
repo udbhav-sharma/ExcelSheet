@@ -27,124 +27,165 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
     ];
 
     //Pre Initialized
-    $scope.exams= [
+    var exams= [
         {examId:1, examName:'Minor 1', maxMarks:10},
         {examId:2, examName:'Mid', maxMarks:30},
         {examId:3, examName:'Minor 2', maxMarks:10},
         {examId:4, examName:'End', maxMarks:50}
     ];
-    $scope.rollNumbers = generateRandomRollNumbers();
 
-    //Default Assignment
-    $scope.cells = initializeCells();
-    $scope.contribution = initializeContribution();
-    $scope.grades={};
-    $scope.avg = {};
-    $scope.total = {};
+    var students = generateStudents( exams );
+    var avg = {};
+    var contribution = initializeContribution( exams );
+
+    $scope.grid={
+        exams        : exams,
+        students     : students,
+        avg          : avg,
+        contribution : contribution
+    };
+
+    $scope.orderBy = 'rollNumber';
+    $scope.reverseSort = false;
 
     //Functions
 
     //Initialization Functions
-    function initializeCells(){
-        var cells={};
-        for(var i in $scope.rollNumbers) {
-            cells[$scope.rollNumbers[i]] = {};
-            for (var j in $scope.exams)
-                cells[$scope.rollNumbers[i]][$scope.exams[j].examId] = defaultValue;
-        }
-        return cells;
-    }
-
-    function initializeContribution(){
+    function initializeContribution(exams){
         var contribution={};
-        for (var i in $scope.exams)
-            contribution[$scope.exams[i].examId] = 1;
+        for (var i in exams)
+            contribution[exams[i].examId] = 1;
         return contribution;
     }
 
-    function generateRandomRollNumbers(){
+    function generateStudents( exams ){
         var min = 117101;
-        var max =  117170;
+        var max =  117125;
         var last = Math.floor(Math.random() * (max - min)) + min;
-        var roll=[];
+
+        var students = [];
+        var rollNumber;
+        var grade = defaultValue;
+        var totalMarks = defaultValue;
+
         for(var i=min; i<=last; i++){
-            roll.push(i);
+            rollNumber = i;
+            students.push(
+                {
+                    rollNumber:rollNumber,
+                    name:'test',
+                    marks:{},
+                    totalMarks:totalMarks,
+                    grade:grade
+                }
+            );
         }
-        return roll;
+
+        return students;
     }
 
-    $scope.fillCell = function fillCell(){
+    //Scope functions
+    $scope.fillGrid = function fillGrid(){
         var min, max, value;
-        for (var i in $scope.rollNumbers){
-            for(var j in $scope.exams){
-                max=$scope.exams[j].maxMarks;
+        for (var i in $scope.grid.students){
+            for(var j in $scope.grid.exams){
+                max=$scope.grid.exams[j].maxMarks;
                 min=0;
                 value = Math.floor(Math.random() * (max - min)) + min;
-                $scope.cells[$scope.rollNumbers[i]][$scope.exams[j].examId] = value;
-                //console.log(value);
+                $scope.grid.students[i].marks[ $scope.grid.exams[j].examId ] = value;
             }
         }
     }
 
-    $scope.calculateAverageMarks = function calculateAverageMarks( column ){
+    $scope.calculateAverageMarks = function calculateAverageMarks( examId ){
         var list = [];
-        for(var i in $scope.rollNumbers)
-            list.push($scope.cells[$scope.rollNumbers[i]][column]);
+        for(var i in $scope.grid.students)
+            list.push($scope.grid.students[i].marks[examId]);
 
-        $scope.avg[column] = average(list);
-        return $scope.avg[column];
+        $scope.grid.avg[examId] = average(list);
+        return $scope.grid.avg[examId];
     }
 
-    $scope.calculateColumnTotal = function calculateColumnTotal( arrayList ){
-        var list = [];
-        for(var i in arrayList)
-            list.push(arrayList[i]);
+    $scope.calculateStudentTotalMarks = function calculateStudentTotalMarks( roll ) {
+        var i = getStudent( roll );
+        if(i === -1)
+            return;
 
-        return sum(list);
-    }
-
-    $scope.calculateColumnContributionTotal = function calculateColumnContributionTotal( arrayList ){
         var list = [];
         var value;
-        for(var i in arrayList){
-            if(isFormatValid($scope.contribution[i]) && isFormatValid(arrayList[i]))
-                value=arrayList[i]*$scope.contribution[i];
+
+        for( var examId in $scope.grid.students[i].marks ) {
+            if ( isFormatValid($scope.grid.students[i].marks[examId]) &&
+                isFormatValid($scope.grid.contribution[examId])) {
+                value = $scope.grid.students[i].marks[examId] * $scope.grid.contribution[examId];
+            }
             else
                 value=defaultValue;
-
             list.push(value);
         }
+
+        $scope.grid.students[i].totalMarks = sum(list);
+        return $scope.grid.students[i].totalMarks;
+    }
+
+    $scope.calculateTotalMaxMarks = function calculateTotalMarks(){
+        var value;
+        var list = [];
+        for( var i in $scope.grid.exams ) {
+            if ( isFormatValid($scope.grid.exams[i].maxMarks) &&
+                isFormatValid($scope.grid.contribution[$scope.grid.exams[i].examId])) {
+                value = $scope.grid.exams[i].maxMarks * $scope.grid.contribution[$scope.grid.exams[i].examId];
+            }
+            else
+                value=defaultValue;
+            list.push(value);
+        }
+
         return sum(list);
     }
 
-    $scope.calculateTotalMarks = function calculateTotalMarks( roll, arrayList ) {
-        var totalMarks = $scope.calculateColumnContributionTotal(arrayList);
-        $scope.total[roll] = totalMarks;
-        return totalMarks;
+    $scope.calculateTotalAverageMarks = function calculateTotalAverageMarks(){
+        var list = [];
+        for(var i in $scope.grid.students)
+            list.push($scope.grid.students[i].totalMarks);
+
+        return average(list);
     }
 
     $scope.calculateGrade = function calculateGrade(){
         var finalGrade;
-        for(var j in $scope.total){
+
+        for(var j in $scope.grid.students){
             finalGrade=defaultValue;
             for( var i in $scope.gradeType ){
-                if(!isFormatValid($scope.total[j]))
+                if(!isFormatValid($scope.grid.students[j].totalMarks))
                     break;
                 if(isFormatValid($scope.gradeType[i].minMarks) &&
-                    parseFloat($scope.total[j]) >= parseFloat($scope.gradeType[i].minMarks)){
+                    parseFloat($scope.grid.students[j].totalMarks) >= parseFloat($scope.gradeType[i].minMarks)){
                     finalGrade = $scope.gradeType[i].grade;
                     break;
                 }
             }
-            $scope.grades[j]=finalGrade;
+            $scope.grid.students[j].grade=finalGrade;
         }
         $scope.drawGraph();
     }
 
     $scope.drawGraph = function drawGraph(){
         var gradeCount = getGradesCount();
-        console.log(gradeCount);
         draw( gradeCount );
+    }
+
+    //Helper functions
+    function getStudent( rollNumber ){
+        var j=-1;
+        for( var i in $scope.grid.students ){
+            if( $scope.grid.students[i].rollNumber == rollNumber ){
+                j=i;
+                break;
+            }
+        }
+        return j;
     }
 
     function getGradesCount(){
@@ -154,9 +195,9 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
             gradeCount.push({'grade':$scope.gradeType[i].grade, 'count':0 });
         }
 
-        for( i in $scope.grades ){
+        for( i in $scope.grid.students ){
             for( var j in gradeCount ){
-                if(gradeCount[j].grade==$scope.grades[i])
+                if(gradeCount[j].grade==$scope.grid.students[i].grade)
                     gradeCount[j].count++;
             }
         }

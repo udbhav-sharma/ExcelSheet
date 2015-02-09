@@ -25,35 +25,35 @@
             <table>
                 <tr class="column-label">
                     <td></td>
-                    <td ng-repeat="exam in exams">{{exam.examName}}</td>
-                    <td> Total </td>
+                    <td ng-repeat="exam in grid.exams">{{exam.examName}}</td>
+                    <td> Total Marks </td>
                     <td> Grade </td>
                 </tr>
 
-                <tr ng-repeat="roll in rollNumbers">
-                    <td class="row-label">{{roll}}</td>
-                    <td ng-repeat="exam in exams">
+                <tr ng-repeat="student in grid.students|orderBy:orderBy:reverseSort">
+                    <td class="row-label">{{student.rollNumber}}</td>
+                    <td ng-repeat="exam in grid.exams">
                         <div>
-                            <input type="text" ng-pattern="marksPattern" ng-model="cells[roll][exam.examId]" >
-                            <div class="output">{{cells[roll][exam.examId]}}</div>
+                            <input type="text" ng-pattern="marksPattern" ng-model="student.marks[exam.examId]" >
+                            <div ng-bind="student.marks[exam.examId]" class="output"></div>
                         </div>
                     </td>
                     <td>
                         <div>
-                            <div ng-bind="calculateTotalMarks(roll,cells[roll])" class="output"></div>
+                            <div ng-bind="calculateStudentTotalMarks(student.rollNumber)" class="output"></div>
                         </div>
                     </td>
                     <td>
                         <div>
-                            <input ng-pattern="gradePattern" ng-change="drawGraph()" ng-model="grades[roll]" >
-                            <div class="output" >{{grades[roll]}}</div>
+                            <input ng-pattern="gradePattern" ng-change="drawGraph()" ng-model="student.grade" >
+                            <div class="output" >{{student.grade}}</div>
                         </div>
                     </td>
                 </tr>
 
                 <tr>
                     <td class="row-label"></td>
-                    <td ng-repeat="exam in exams">
+                    <td ng-repeat="exam in grid.exams">
                         <div>
                             <div class="output"></div>
                         </div>
@@ -67,21 +67,21 @@
 
                 <tr>
                     <td class="row-label">Average</td>
-                    <td ng-repeat="exam in exams">
+                    <td ng-repeat="exam in grid.exams">
                         <div>
                             <div ng-bind="calculateAverageMarks(exam.examId)"class="output"></div>
                         </div>
                     </td>
                     <td>
                         <div>
-                            <div ng-bind="calculateColumnContributionTotal(avg)" class="output"></div>
+                            <div ng-bind="calculateTotalAverageMarks()" class="output"></div>
                         </div>
                     </td>
                 </tr>
 
                 <tr>
                     <td class="row-label"></td>
-                    <td ng-repeat="exam in exams">
+                    <td ng-repeat="exam in grid.exams">
                         <div>
                             <div class="output"></div>
                         </div>
@@ -95,7 +95,7 @@
 
                 <tr>
                     <td class="row-label">Max Marks</td>
-                    <td ng-repeat="exam in exams">
+                    <td ng-repeat="exam in grid.exams">
                         <div>
                             <input ng-pattern="marksPattern" ng-model="exam.maxMarks">
                             <div class="output" >{{exam.maxMarks}}</div>
@@ -103,17 +103,17 @@
                     </td>
                     <td>
                         <div>
-                            <div ng-bind="" class="output"></div>
+                            <div ng-bind="calculateTotalMaxMarks()" class="output"></div>
                         </div>
                     </td>
                 </tr>
 
                 <tr>
                     <td class="row-label">Contribution</td>
-                    <td ng-repeat="exam in exams">
+                    <td ng-repeat="exam in grid.exams">
                         <div>
-                            <input ng-pattern="marksPattern" ng-model="contribution[exam.examId]">
-                            <div class="output" >{{contribution[exam.examId]}}</div>
+                            <input ng-pattern="marksPattern" ng-model="grid.contribution[exam.examId]">
+                            <div class="output" >{{grid.contribution[exam.examId]}}</div>
                         </div>
                     </td>
                 </tr>
@@ -137,7 +137,10 @@
             <div class="row">
                 <div class="col-md-12">
                     <button type="button" class="btn btn-sm btn-danger" ng-click="calculateGrade()"><span class="fa fa-graduation-cap"></span>  Assign Grade</button>
-                    <button type="button" class="btn btn-sm btn-default" ng-click="fillCell()"><span class="fa fa-random"></span> Random Cell Value</button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-default" ng-click="fillGrid()"><span class="fa fa-random"></span> Random Cell Value</button>
+                        <button type="button" class="btn btn-sm btn-default" ng-click="reverseSort=!reverseSort;"><span class="fa fa-sort"></span>Toggle Sort</button>
+                    </div>
                 </div>
             </div>
             <hr>
