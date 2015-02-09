@@ -45,7 +45,7 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
         contribution : contribution
     };
 
-    $scope.orderBy = 'rollNumber';
+    $scope.orderByField = 'rollNumber';
     $scope.reverseSort = false;
 
     //Functions

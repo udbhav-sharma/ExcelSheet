@@ -24,13 +24,44 @@
         <div class="col-md-7">
             <table>
                 <tr class="column-label">
-                    <td></td>
-                    <td ng-repeat="exam in grid.exams">{{exam.examName}}</td>
-                    <td> Total Marks </td>
-                    <td> Grade </td>
+                    <td>
+                        <a href="#" ng-click="orderByField='rollNumber'; reverseSort = !reverseSort">
+                            Roll
+                            <span ng-show="orderByField == 'rollNumber'">
+                                <span ng-show="!reverseSort" class="fa fa-sort-asc"></span>
+                                <span ng-show="reverseSort" class="fa fa-sort-desc"></span>
+                            </span>
+                            <span ng-show="orderByField != 'rollNumber'" class="fa fa-sort"></span>
+                        </a>
+                    </td>
+                    <td ng-repeat="exam in grid.exams">
+                        <a href="#">
+                            {{exam.examName}}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#" ng-click="orderByField='totalMarks'; reverseSort = !reverseSort">
+                             Total
+                            <span ng-show="orderByField == 'totalMarks'">
+                                <span ng-show="!reverseSort" class="fa fa-sort-asc"></span>
+                                <span ng-show="reverseSort" class="fa fa-sort-desc"></span>
+                            </span>
+                            <span ng-show="orderByField != 'totalMarks'" class="fa fa-sort"></span>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#" ng-click="orderByField='grade'; reverseSort = !reverseSort">
+                            Grade
+                            <span ng-show="orderByField == 'grade'">
+                                <span ng-show="!reverseSort" class="fa fa-sort-asc"></span>
+                                <span ng-show="reverseSort" class="fa fa-sort-desc"></span>
+                            </span>
+                            <span ng-show="orderByField != 'grade'" class="fa fa-sort"></span>
+                        </a>
+                    </td>
                 </tr>
 
-                <tr ng-repeat="student in grid.students|orderBy:orderBy:reverseSort">
+                <tr ng-repeat="student in grid.students|orderBy:orderByField:reverseSort">
                     <td class="row-label">{{student.rollNumber}}</td>
                     <td ng-repeat="exam in grid.exams">
                         <div>
@@ -137,10 +168,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <button type="button" class="btn btn-sm btn-danger" ng-click="calculateGrade()"><span class="fa fa-graduation-cap"></span>  Assign Grade</button>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-sm btn-default" ng-click="fillGrid()"><span class="fa fa-random"></span> Random Cell Value</button>
-                        <button type="button" class="btn btn-sm btn-default" ng-click="reverseSort=!reverseSort;"><span class="fa fa-sort"></span>Toggle Sort</button>
-                    </div>
+                    <button type="button" class="btn btn-sm btn-default" ng-click="fillGrid()"><span class="fa fa-random"></span> Random Marks</button>
                 </div>
             </div>
             <hr>
