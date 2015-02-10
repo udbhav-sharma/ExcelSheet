@@ -171,6 +171,10 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
         $scope.drawGraph();
     }
 
+    $scope.bellCurveGrades = function bellCurveGrades(){
+
+    }
+
     $scope.drawGraph = function drawGraph(){
         var gradeCount = getGradesCount();
         draw( gradeCount );
@@ -233,6 +237,7 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
 
 });
 
+//Draws graph using Morris js
 function draw( graphData ){
     $('#graph').html('');
     Morris.Bar({
