@@ -1,4 +1,4 @@
-var app = angular.module('exam',[]).
+var app = angular.module('exam',['alert_module']).
     constant(
         "CONSTANTS",{
             SUCCESS_CODE: 1,
