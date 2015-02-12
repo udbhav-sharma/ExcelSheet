@@ -60,7 +60,7 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
 
     function generateStudents( exams ){
         var min = 117101;
-        var max =  117125;
+        var max =  117190;
         var last = Math.floor(Math.random() * (max - min)) + min;
 
         var students = [];
@@ -172,6 +172,43 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
     }
 
     $scope.bellCurveGrades = function bellCurveGrades(){
+        var K = $scope.gradeType.length;
+        var lambda = K/2+1/3;
+        var u = 2;
+        var N = $scope.grid.students.length;
+        var bellCurveGradeOb = [];
+        var gradeCount=0;
+
+        for(var k= 1,j=0; k<=K; k++,j++) {
+            var count = pmf(lambda,N,k);
+            gradeCount+=count;
+            bellCurveGradeOb.push({'grade':$scope.gradeType[j].grade, 'count':count});
+        }
+
+        bellCurveGradeOb[Math.floor(lambda)].count+=N-gradeCount;
+
+        var students = $scope.grid.students;
+        students.sort(function(s1,s2){
+            if(s1.totalMarks < s2.totalMarks)
+                return 1;
+            if(s1.totalMarks > s2.totalMarks)
+                return -1;
+            return 0;
+        });
+
+        var i= 0,t;
+        for(var j in bellCurveGradeOb){
+            for(var k=0;k<bellCurveGradeOb[j].count;k++,i++){
+                t = getStudent(students[i].rollNumber);
+                if(t==-1)
+                    continue;
+                $scope.grid.students[t].grade=bellCurveGradeOb[j].grade;
+            }
+        }
+
+        $scope.drawGraph();
+        //console.log(students);
+        //console.log(bellCurveGradeOb);
 
     }
 
@@ -233,6 +270,17 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
         if(value===defaultValue || angular.isUndefined( value ))
             return false;
         return true;
+    }
+
+    function pmf( lambda, N, k ){
+        return Math.floor((((Math.pow(lambda,k)*Math.exp(-lambda))/factorial(k))*N));
+    }
+
+    function factorial(k){
+        var val=1;
+        for(var i=1;i<=k;i++)
+            val*=i;
+        return val;
     }
 
 });
