@@ -214,7 +214,12 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
 
     $scope.drawGraph = function drawGraph(){
         var gradeCount = getGradesCount();
-        draw( gradeCount );
+        var graphData = {grades:[],count:[]};
+        for(var j in gradeCount){
+            graphData.grades.push(gradeCount[j].grade);
+            graphData.count.push(gradeCount[j].count);
+        }
+        drawChart( graphData );
     }
 
     //Helper functions
@@ -286,13 +291,23 @@ app.controller('sheet', function($scope, CONSTANTS, $http) {
 });
 
 //Draws graph using Morris js
-function draw( graphData ){
-    $('#graph').html('');
-    Morris.Bar({
-        element: 'graph',
-        data:graphData,
-        xkey: 'grade',
-        ykeys: ['count'],
-        labels: ['Grade Count']
-    });
+function drawChart(graphData){
+    var data = {
+        labels: graphData.grades,
+        datasets: [
+            {
+                label: "My First dataset",
+                fillColor: "rgba(151,187,205,0.2)",
+                strokeColor: "rgba(151,187,205,1)",
+                pointColor: "rgba(151,187,205,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(151,187,205,1)",
+                data: graphData.count
+            }
+        ]
+    };
+
+    var ctx = document.getElementById("grades_chart").getContext("2d");
+    var myLineChart = new Chart(ctx).Line(data);
 }

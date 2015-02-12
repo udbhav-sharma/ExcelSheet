@@ -180,12 +180,11 @@
             <hr>
             <div class="row">
                 <div class="col-md-12">
-                    <button type="button" class="btn btn-sm btn-primary" ng-click="drawGraph()"><span class="fa fa-bar-chart"></span> Grades Bar Chart</button>
+                    <button type="button" class="btn btn-sm btn-primary" ng-click="drawGraph()"><span class="fa fa-bar-chart"></span> Grades Distribution</button>
                 </div>
             </div>
             <div class="row">
-                <div id="graph">
-                </div>
+                <canvas id="grades_chart" width="400" height="400"></canvas>
             </div>
         </div>
     </div>
@@ -199,6 +198,7 @@
 
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/angular-route/angular-route.js"></script>
+<script src="bower_components/Chart.js/Chart.min.js"></script>
 <script src="alert.js"></script>
 <script src="app.js"></script>
 <script src="components/version/version.js"></script>
